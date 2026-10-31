@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -27,6 +27,22 @@ app.post('/api/courses', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 8080;
+
+app.get('/api/courses/:id', async (req, res) => {
+    try {
+        await client.connect();
+        const database = client.db('ResourceHubDB');
+        const courses = database.collection('Courses');
+        
+        const course = await courses.findOne({ _id: new ObjectId(req.params.id) });
+        res.status(200).json(course);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch course' });
+    } finally {
+        await client.close();
+    }
+});
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
