@@ -18,10 +18,11 @@ app.post('/api/courses', async (req, res) => {
         
         const { courseId, fileName, fileUri } = req.body;
 
-        // Find the specific course and push the new document into its studyNotes array
+        // Find the specific course and push the new document, or create it if missing
         const result = await courses.updateOne(
             { _id: new ObjectId(courseId) },
-            { $push: { studyNotes: { _id: new ObjectId(), fileName: fileName, fileUri: fileUri } } }
+            { $push: { studyNotes: { _id: new ObjectId(), fileName: fileName, fileUri: fileUri } } },
+            { upsert: true }
         );
         
         res.status(201).json({ success: true, modifiedCount: result.modifiedCount });
