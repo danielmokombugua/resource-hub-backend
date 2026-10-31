@@ -16,8 +16,15 @@ app.post('/api/courses', async (req, res) => {
         const database = client.db('ResourceHubDB');
         const courses = database.collection('Courses');
         
-        const result = await courses.insertOne(req.body);
-        res.status(201).json({ success: true, insertedId: result.insertedId });
+        const { courseId, fileName, fileUri } = req.body;
+
+        // Find the specific course and push the new document into its studyNotes array
+        const result = await courses.updateOne(
+            { _id: new ObjectId(courseId) },
+            { $push: { studyNotes: { _id: new ObjectId(), fileName: fileName, fileUri: fileUri } } }
+        );
+        
+        res.status(201).json({ success: true, modifiedCount: result.modifiedCount });
     } catch (error) {
         console.error("Database error:", error);
         res.status(500).json({ error: 'Failed to sync with database' });
