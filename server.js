@@ -77,6 +77,21 @@ app.post('/api/courses/create', async (req, res) => {
         await client.close();
     }
 });
+app.get('/api/courses', async (req, res) => {
+    try {
+        await client.connect();
+        const database = client.db('ResourceHubDB');
+        const courses = database.collection('Courses');
+        
+        const allCourses = await courses.find({}).toArray();
+        res.status(200).json(allCourses);
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).json({ error: 'Failed to fetch courses' });
+    } finally {
+        await client.close();
+    }
+});
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
