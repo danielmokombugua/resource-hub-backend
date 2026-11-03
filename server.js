@@ -51,6 +51,32 @@ app.get('/api/courses/:id', async (req, res) => {
         await client.close();
     }
 });
+app.post('/api/courses/create', async (req, res) => {
+    try {
+        await client.connect();
+        const database = client.db('ResourceHubDB');
+        const courses = database.collection('Courses');
+        
+        const { courseName, courseCode, category } = req.body;
+
+        // Create the new course with empty arrays for future files
+        const newCourse = {
+            courseName: courseName,
+            courseCode: courseCode,
+            category: category,
+            studyNotes: [],
+            assignments: []
+        };
+
+        const result = await courses.insertOne(newCourse);
+        res.status(201).json({ success: true, insertedId: result.insertedId });
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).json({ error: 'Failed to create course' });
+    } finally {
+        await client.close();
+    }
+});
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
