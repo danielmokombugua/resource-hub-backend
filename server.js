@@ -92,6 +92,21 @@ app.get('/api/courses', async (req, res) => {
         await client.close();
     }
 });
+app.delete('/api/courses/:id', async (req, res) => {
+    try {
+        await client.connect();
+        const database = client.db('ResourceHubDB');
+        const courses = database.collection('Courses');
+        
+        const result = await courses.deleteOne({ _id: new ObjectId(req.params.id) });
+        res.status(200).json({ success: true, deletedCount: result.deletedCount });
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).json({ error: 'Failed to delete course' });
+    } finally {
+        await client.close();
+    }
+});
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
