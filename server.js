@@ -106,6 +106,28 @@ app.delete('/api/courses/:id', async (req, res) => {
     } finally {
         await client.close();
     }
+
+    app.delete('/api/courses/:courseId/documents/:noteId', async (req, res) => {
+    try {
+        await client.connect();
+        const database = client.db('ResourceHubDB');
+        const courses = database.collection('Courses');
+        
+        const { courseId, noteId } = req.params;
+
+        const result = await courses.updateOne(
+            { _id: new ObjectId(courseId) },
+            { $pull: { studyNotes: { _id: new ObjectId(noteId) } } }
+        );
+        
+        res.status(200).json({ success: true, modifiedCount: result.modifiedCount });
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).json({ error: 'Failed to delete document' });
+    } finally {
+        await client.close();
+    }
+});
 });
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
