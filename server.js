@@ -106,7 +106,7 @@ app.delete('/api/courses/:id', async (req, res) => {
     } finally {
         await client.close();
     }
-
+   });
     app.delete('/api/courses/:courseId/documents/:noteId', async (req, res) => {
     try {
         await client.connect();
@@ -128,7 +128,7 @@ app.delete('/api/courses/:id', async (req, res) => {
         await client.close();
     }
 });
-});
+
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
